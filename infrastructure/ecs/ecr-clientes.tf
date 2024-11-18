@@ -121,17 +121,10 @@ resource "aws_iam_policy_attachment" "ecs_instance_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
-# Key Pair para SSH
-resource "aws_key_pair" "ecs_key" {
-  key_name   = "ecs_key"
-  public_key = file("~/.ssh/id_rsa.pub")
-}
-
 # EC2 Instance para ECS
 resource "aws_instance" "ecs_instance" {
   ami                    = data.aws_ami.ecs_optimized.id
   instance_type          = "t3.micro"
-  key_name               = aws_key_pair.ecs_key.key_name
   subnet_id              = aws_subnet.public_subnet.id
   associate_public_ip_address = true
   iam_instance_profile   = aws_iam_instance_profile.ecs_instance_profile.id
