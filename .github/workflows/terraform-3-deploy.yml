@@ -29,10 +29,11 @@ jobs:
         id: save-report
         run: echo "test_report_path=test-reports/test-report.xml" >> $GITHUB_ENV
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarcloud-github-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
       - name: Verify coverage
         run: |
           COVERAGE=$(curl -s "https://sonarcloud.io/api/measures/component?component=${{ secrets.SONAR_PROJECT_KEY }}&metricKeys=coverage" \
