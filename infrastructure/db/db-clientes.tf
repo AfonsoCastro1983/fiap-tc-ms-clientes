@@ -7,7 +7,7 @@ resource "aws_db_instance" "fiap-ms-cliente" {
   max_allocated_storage = 100
   storage_type         = "gp2"
   engine               = "postgres"
-  instance_class       = "db.t3.nano"
+  instance_class       = "db.t3.micro"
   db_name              = "ms-cliente"
   username             = var.db_username
   password             = var.db_password
