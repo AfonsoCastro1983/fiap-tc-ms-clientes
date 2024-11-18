@@ -25,6 +25,10 @@ module.exports = {
       {
         outputDirectory: "test-reports",
         outputName: "test-report.xml",
+        ancestorSeparator: " › ", // Configura separadores adequados para Sonar
+        suiteNameTemplate: "{filepath}",
+        classNameTemplate: "{classname}",
+        titleTemplate: "{title}",
       },
     ],
   ]
