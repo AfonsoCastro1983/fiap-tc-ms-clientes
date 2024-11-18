@@ -1,4 +1,4 @@
-# Criação do ECS
+# Provedor AWS
 provider "aws" {
   region = "us-east-2"
 }
@@ -14,7 +14,7 @@ resource "aws_vpc" "ms_clientes_vpc" {
 }
 
 # Subnet pública
-resource "aws_subnet" "public_subnet" {
+resource "aws_subnet" "ms_clientes_public_subnet" {
   vpc_id                  = aws_vpc.ms_clientes_vpc.id
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true
@@ -37,7 +37,7 @@ resource "aws_internet_gateway" "ms_clientes_igw" {
 }
 
 # Tabela de Roteamento
-resource "aws_route_table" "public_route_table" {
+resource "aws_route_table" "ms_clientes_public_route_table" {
   vpc_id = aws_vpc.ms_clientes_vpc.id
 
   route {
@@ -52,13 +52,13 @@ resource "aws_route_table" "public_route_table" {
 }
 
 # Associação da Tabela de Roteamento à Subnet
-resource "aws_route_table_association" "public_route_association" {
-  subnet_id      = aws_subnet.public_subnet.id
-  route_table_id = aws_route_table.public_route_table.id
+resource "aws_route_table_association" "ms_clientes_public_route_association" {
+  subnet_id      = aws_subnet.ms_clientes_public_subnet.id
+  route_table_id = aws_route_table.ms_clientes_public_route_table.id
 }
 
-# Security Group para EC2/ECS
-resource "aws_security_group" "ecs_sg" {
+# Security Group
+resource "aws_security_group" "ms_clientes_ecs_sg" {
   vpc_id = aws_vpc.ms_clientes_vpc.id
 
   ingress {
@@ -81,7 +81,56 @@ resource "aws_security_group" "ecs_sg" {
   }
 }
 
-# Cluster ECS
+# Load Balancer
+resource "aws_lb" "ms_clientes_ecs_lb" {
+  name               = "ms_clientes_ecs_lb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.ms_clientes_ecs_sg.id]
+  subnets            = [aws_subnet.ms_clientes_public_subnet.id]
+
+  tags = {
+    Name        = "ms_clientes_ecs_lb"
+    Application = "FIAP-TechChallenge"
+  }
+}
+
+# Listener do Load Balancer
+resource "aws_lb_listener" "ms_clientes_ecs_lb_listener" {
+  load_balancer_arn = aws_lb.ms_clientes_ecs_lb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.ms_clientes_ecs_target_group.arn
+  }
+}
+
+# Target Group
+resource "aws_lb_target_group" "ms_clientes_ecs_target_group" {
+  name        = "ms_clientes_ecs_target_group"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.ms_clientes_vpc.id
+  target_type = "instance"
+
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200"
+  }
+
+  tags = {
+    Name        = "ms_clientes_ecs_target_group"
+    Application = "FIAP-TechChallenge"
+  }
+}
+
+# ECS Cluster
 resource "aws_ecs_cluster" "ms_clientes_cluster" {
   name = "ms_Clientes-ECS-Cluster"
 
@@ -89,68 +138,6 @@ resource "aws_ecs_cluster" "ms_clientes_cluster" {
     Name        = "ms_Clientes-ECS-Cluster"
     Application = "FIAP-TechChallenge"
   }
-}
-
-# IAM Role para EC2
-resource "aws_iam_role" "ecs_instance_role" {
-  name = "ecsInstanceRole"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
-
-  tags = {
-    Name        = "ecs-instance-role"
-    Application = "FIAP-TechChallenge"
-  }
-}
-
-# Anexar políticas ao IAM Role
-resource "aws_iam_policy_attachment" "ecs_instance_role_policy" {
-  name       = "ecs-instance-role-policy"
-  roles      = [aws_iam_role.ecs_instance_role.name]
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
-}
-
-# EC2 Instance para ECS
-resource "aws_instance" "ecs_instance" {
-  ami                    = data.aws_ami.ecs_optimized.id
-  instance_type          = "t3.micro"
-  subnet_id              = aws_subnet.public_subnet.id
-  associate_public_ip_address = true
-  iam_instance_profile   = aws_iam_instance_profile.ecs_instance_profile.id
-  security_groups        = [aws_security_group.ecs_sg.id]
-
-  tags = {
-    Name        = "ms_Clientes-ECS-Instance"
-    Application = "FIAP-TechChallenge"
-  }
-}
-
-# AMI para ECS Otimizado
-data "aws_ami" "ecs_optimized" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-ecs-hvm-*-x86_64-ebs"]
-  }
-}
-
-# IAM Instance Profile
-resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "ecs-instance-profile"
-  role = aws_iam_role.ecs_instance_role.name
 }
 
 # ECS Task Definition
@@ -162,8 +149,8 @@ resource "aws_ecs_task_definition" "ms_clientes_task" {
   memory                   = "512"
 
   container_definitions = jsonencode([{
-    name      = "ms-clientes-app"
-    image     = "992382363343.dkr.ecr.us-east-2.amazonaws.com/ms-clientes:latest" #Imagem do microserviço
+    name      = "fiap-msclientes-app"
+    image     = "992382363343.dkr.ecr.us-east-2.amazonaws.com/ms-clientes:latest"
     essential = true
     portMappings = [
       {
@@ -175,7 +162,7 @@ resource "aws_ecs_task_definition" "ms_clientes_task" {
     environment = [
       {
         name  = "MODE"
-        value = "ECS"
+        value = "Máquina local"
       },
       {
         name  = "TYPEORM_HOST"
@@ -191,7 +178,7 @@ resource "aws_ecs_task_definition" "ms_clientes_task" {
       },
       {
         name  = "TYPEORM_DATABASE"
-        value = "mscliente"
+        value = "lanchonete"
       }
     ]
   }])
@@ -209,6 +196,12 @@ resource "aws_ecs_service" "ms_clientes_service" {
   task_definition = aws_ecs_task_definition.ms_clientes_task.arn
   desired_count   = 1
   launch_type     = "EC2"
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.ms_clientes_ecs_target_group.arn
+    container_name   = "fiap-msclientes-app"
+    container_port   = 80
+  }
 
   tags = {
     Name        = "ms_Clientes-ECS-Service"
