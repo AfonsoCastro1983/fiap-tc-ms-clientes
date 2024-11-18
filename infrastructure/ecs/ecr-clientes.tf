@@ -1,4 +1,4 @@
-#Criação do ECS
+# Criação do ECS
 provider "aws" {
   region = "us-east-2"
 }
