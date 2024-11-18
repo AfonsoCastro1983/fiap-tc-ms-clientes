@@ -125,7 +125,6 @@ resource "aws_iam_policy_attachment" "ecs_instance_role_policy" {
 resource "aws_instance" "ecs_instance" {
   ami                    = data.aws_ami.ecs_optimized.id
   instance_type          = "t3.micro"
-  identifier             = "mscliente_ecs_instance"
   subnet_id              = aws_subnet.public_subnet.id
   associate_public_ip_address = true
   iam_instance_profile   = aws_iam_instance_profile.ecs_instance_profile.id
@@ -163,7 +162,7 @@ resource "aws_ecs_task_definition" "ms_clientes_task" {
   memory                   = "512"
 
   container_definitions = jsonencode([{
-    name      = "typescript-app"
+    name      = "ms-clientes-app"
     image     = "992382363343.dkr.ecr.us-east-2.amazonaws.com/ms-clientes:latest" #Imagem do microserviço
     essential = true
     portMappings = [
@@ -171,6 +170,28 @@ resource "aws_ecs_task_definition" "ms_clientes_task" {
         containerPort = 80
         hostPort      = 80
         protocol      = "tcp"
+      }
+    ]
+    environment = [
+      {
+        name  = "MODE"
+        value = "ECS"
+      },
+      {
+        name  = "TYPEORM_HOST"
+        value = "fiap-ms-cliente.c9qyy4w40svf.us-east-2.rds.amazonaws.com"
+      },
+      {
+        name  = "TYPEORM_USERNAME"
+        value = var.db_user
+      },
+      {
+        name  = "TYPEORM_PASS"
+        value = var.db_password
+      },
+      {
+        name  = "TYPEORM_DATABASE"
+        value = "mscliente"
       }
     ]
   }])
@@ -184,7 +205,6 @@ resource "aws_ecs_task_definition" "ms_clientes_task" {
 # ECS Service
 resource "aws_ecs_service" "ms_clientes_service" {
   name            = "ms_Clientes-service"
-  identifier      = "ms_Clientes-service"
   cluster         = aws_ecs_cluster.ms_clientes_cluster.id
   task_definition = aws_ecs_task_definition.ms_clientes_task.arn
   desired_count   = 1

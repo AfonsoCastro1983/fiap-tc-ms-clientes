@@ -39,4 +39,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: us-east-1 # Ajuste para sua região
+          AWS_DEFAULT_REGION: us-east-1
+          PASSWORD_DB: ${{ secrets.PASSWORD_DB }}
+          USER_DB: ${{ secrets.USER_DB }}
+        run: terraform apply -auto-approve -var "db_user=${{ secrets.USER_DB }}" -var "db_password=${{ secrets.PASSWORD_DB }}"
