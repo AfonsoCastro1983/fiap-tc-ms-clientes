@@ -25,6 +25,9 @@ jobs:
           npm test -- --coverage
         env:
           CI: true
+      - name: Save test report path
+        id: save-report
+        run: echo "test_report_path=test-reports/test-report.xml" >> $GITHUB_ENV
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
