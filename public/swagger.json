@@ -1,0 +1,174 @@
+{
+	"openapi": "3.0.0",
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"ClienteResponse": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"nome": {
+						"type": "string"
+					},
+					"cpf": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"nome",
+					"cpf",
+					"email"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
+			"ClienteRequest": {
+				"properties": {
+					"nome": {
+						"type": "string"
+					},
+					"idcognito": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"cpf": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"nome",
+					"idcognito",
+					"email",
+					"cpf"
+				],
+				"type": "object",
+				"additionalProperties": true
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "fiap-tc-ms-clientes",
+		"version": "1.0.0",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {}
+	},
+	"paths": {
+		"/cliente": {
+			"post": {
+				"operationId": "SalvarCliente",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ClienteResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Cadastro do cliente: nome e e-mail",
+				"tags": [
+					"Cliente"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ClienteRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/cliente/cpf/{cpf}": {
+			"get": {
+				"operationId": "BuscarCPF",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ClienteResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Buscar por CPF",
+				"tags": [
+					"Cliente"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "cpf",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/cliente/email/{email}": {
+			"get": {
+				"operationId": "BuscarEmail",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ClienteResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Buscar por E-mail",
+				"tags": [
+					"Cliente"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "email",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}
