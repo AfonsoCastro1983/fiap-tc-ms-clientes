@@ -9,6 +9,7 @@ resource "aws_db_instance" "fiap-ms-cliente" {
   engine               = "postgres"
   instance_class       = "db.t3.micro"
   db_name              = "mscliente"
+  identifier           = "fiap-ms-cliente"
   username             = var.db_username
   password             = var.db_password
   publicly_accessible  = true
