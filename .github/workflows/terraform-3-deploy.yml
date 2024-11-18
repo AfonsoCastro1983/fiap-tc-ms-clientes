@@ -1,4 +1,4 @@
-name: Deploy app
+name: 3- MS-CLIENTE - Deploy app
 
 on:
   push:
@@ -83,6 +83,6 @@ jobs:
       - name: Update ECS service
         run: |
           aws ecs update-service \
-            --cluster my-ecs-cluster \
-            --service my-ecs-service \
+            --cluster ms_Clientes-ECS-Cluster \
+            --service ms_Clientes-ECS-Service \
             --force-new-deployment
