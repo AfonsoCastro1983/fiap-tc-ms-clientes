@@ -81,13 +81,29 @@ resource "aws_security_group" "ms_clientes_ecs_sg" {
   }
 }
 
-# Load Balancer
+# Subnet pública adicional
+resource "aws_subnet" "ms_clientes_public_subnet_2" {
+  vpc_id                  = aws_vpc.ms_clientes_vpc.id
+  cidr_block              = "10.0.2.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "us-east-2b"
+
+  tags = {
+    Application = "FIAP-TechChallenge"
+    Name        = "ms_Clientes-ECS-Public-Subnet-2"
+  }
+}
+
+# Atualização no Load Balancer
 resource "aws_lb" "ms_clientes_ecs_lb" {
-  name               = "ms-clientes-ecs-lb"
+  name               = "ms_clientes_ecs_lb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ms_clientes_ecs_sg.id]
-  subnets            = [aws_subnet.ms_clientes_public_subnet.id]
+  subnets            = [
+    aws_subnet.ms_clientes_public_subnet.id,
+    aws_subnet.ms_clientes_public_subnet_2.id
+  ]
 
   tags = {
     Name        = "ms_clientes_ecs_lb"
@@ -109,7 +125,7 @@ resource "aws_lb_listener" "ms_clientes_ecs_lb_listener" {
 
 # Target Group
 resource "aws_lb_target_group" "ms_clientes_ecs_target_group" {
-  name        = "ms-clientes-ecs-target-group"
+  name        = "ms_clientes_ecs_target_group"
   port        = 80
   protocol    = "HTTP"
   vpc_id      = aws_vpc.ms_clientes_vpc.id
