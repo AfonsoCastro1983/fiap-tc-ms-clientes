@@ -84,5 +84,5 @@ jobs:
         run: |
           aws ecs update-service \
             --cluster ms_Clientes-ECS-Cluster \
-            --service ms_Clientes-ECS-Service \
+            --service ms_Clientes-service \
             --force-new-deployment
