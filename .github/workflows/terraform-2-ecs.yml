@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'infraestrutura/ecs/**' # Monitora mudanças na pasta 'ecs' ao fazer push na branch 'main'
+      - 'infrastructure/ecs/**' # Monitora mudanças na pasta 'ecs' ao fazer push na branch 'main'
 
 jobs:
   terraform:
@@ -24,18 +24,18 @@ jobs:
       # Inicializar o Terraform
       - name: Terraform Init
         run: terraform init
-        working-directory: ./infraestrutura/ecs
+        working-directory: ./infrastructure/ecs
 
       # Validar os arquivos do Terraform
       - name: Terraform Validate
         run: terraform validate
-        working-directory: ./infraestrutura/ecs
+        working-directory: ./infrastructure/ecs
 
       # Aplicar o Terraform
       - name: Terraform Apply
         id: apply
         run: terraform apply -auto-approve
-        working-directory: ./infraestrutura/ecs
+        working-directory: ./infrastructure/ecs
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

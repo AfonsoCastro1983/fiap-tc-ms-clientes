@@ -1,4 +1,4 @@
-# Criação do banco
+#Criação do banco
 provider "aws" {
   region = "us-east-2" # Ajuste a região conforme necessário
 }
