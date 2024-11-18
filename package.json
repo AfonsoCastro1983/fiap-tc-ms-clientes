@@ -34,6 +34,7 @@
     "concurrently": "^8.2.2",
     "jest": "^29.7.0",
     "jest-junit": "^16.0.0",
+    "jest-sonar": "^0.2.16",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.1.0",
     "morgan": "^1.10.0",
