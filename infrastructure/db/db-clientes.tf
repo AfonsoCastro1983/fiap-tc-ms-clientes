@@ -1,6 +1,5 @@
-#Criação do banco
 provider "aws" {
-  region = "us-east-2" # Ajuste a região conforme necessário
+  region = "us-east-2"
 }
 
 resource "aws_db_instance" "fiap-ms-cliente" {
@@ -15,7 +14,7 @@ resource "aws_db_instance" "fiap-ms-cliente" {
   publicly_accessible  = true
   skip_final_snapshot  = true
 
-  vpc_security_group_ids = [aws_security_group.db_access.id]
+  vpc_security_group_ids = [aws_security_group.fiap-ms-cliente-SG.id]
 
   tags = {
     Application = "FIAP-TechChallenge"
@@ -30,7 +29,7 @@ resource "aws_security_group" "fiap-ms-cliente-SG" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Permite acesso público. Restrinja para endereços IP específicos em produção!
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
