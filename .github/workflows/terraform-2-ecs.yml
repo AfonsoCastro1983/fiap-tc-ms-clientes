@@ -42,4 +42,3 @@ jobs:
           AWS_DEFAULT_REGION: us-east-1
           PASSWORD_DB: ${{ secrets.PASSWORD_DB }}
           USER_DB: ${{ secrets.USER_DB }}
-        run: terraform apply -auto-approve -var "db_user=${{ secrets.USER_DB }}" -var "db_password=${{ secrets.PASSWORD_DB }}"
