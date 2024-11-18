@@ -9,7 +9,7 @@ resource "aws_db_instance" "fiap-ms-cliente" {
   engine               = "postgres"
   instance_class       = "db.t3.nano"
   name                 = "ms-cliente"
-  username             = var.db_user
+  username             = var.db_username
   password             = var.db_password
   publicly_accessible  = true
   skip_final_snapshot  = true
