@@ -249,14 +249,6 @@ resource "aws_autoscaling_group" "ecs_asg" {
     aws_subnet.ms_clientes_public_subnet.id,
     aws_subnet.ms_clientes_public_subnet_2.id
   ]
-
-  tags = [
-    {
-      key                 = "Name"
-      value               = "ms-clientes-ecs-instance"
-      propagate_at_launch = true
-    }
-  ]
 }
 
 # IAM Role para ECS
