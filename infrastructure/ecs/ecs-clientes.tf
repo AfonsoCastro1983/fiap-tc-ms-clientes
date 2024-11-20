@@ -26,6 +26,19 @@ resource "aws_subnet" "ms_clientes_public_subnet" {
   }
 }
 
+# Subnet pública adicional
+resource "aws_subnet" "ms_clientes_public_subnet_2" {
+  vpc_id                  = aws_vpc.ms_clientes_vpc.id
+  cidr_block              = "10.0.2.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "us-east-2b"
+
+  tags = {
+    Application = "FIAP-TechChallenge"
+    Name        = "ms_Clientes-ECS-Public-Subnet-2"
+  }
+}
+
 # Gateway de Internet
 resource "aws_internet_gateway" "ms_clientes_igw" {
   vpc_id = aws_vpc.ms_clientes_vpc.id
@@ -51,9 +64,14 @@ resource "aws_route_table" "ms_clientes_public_route_table" {
   }
 }
 
-# Associação da Tabela de Roteamento à Subnet
-resource "aws_route_table_association" "ms_clientes_public_route_association" {
+# Associação da Tabela de Roteamento às Subnets
+resource "aws_route_table_association" "ms_clientes_public_route_association_1" {
   subnet_id      = aws_subnet.ms_clientes_public_subnet.id
+  route_table_id = aws_route_table.ms_clientes_public_route_table.id
+}
+
+resource "aws_route_table_association" "ms_clientes_public_route_association_2" {
+  subnet_id      = aws_subnet.ms_clientes_public_subnet_2.id
   route_table_id = aws_route_table.ms_clientes_public_route_table.id
 }
 
@@ -78,19 +96,6 @@ resource "aws_security_group" "ms_clientes_ecs_sg" {
   tags = {
     Name        = "ms_Clientes-ECS-SG"
     Application = "FIAP-TechChallenge"
-  }
-}
-
-# Subnet pública adicional
-resource "aws_subnet" "ms_clientes_public_subnet_2" {
-  vpc_id                  = aws_vpc.ms_clientes_vpc.id
-  cidr_block              = "10.0.2.0/24"
-  map_public_ip_on_launch = true
-  availability_zone       = "us-east-2b"
-
-  tags = {
-    Application = "FIAP-TechChallenge"
-    Name        = "ms_Clientes-ECS-Public-Subnet-2"
   }
 }
 
@@ -154,6 +159,64 @@ resource "aws_ecs_cluster" "ms_clientes_cluster" {
     Name        = "ms_Clientes-ECS-Cluster"
     Application = "FIAP-TechChallenge"
   }
+}
+
+# IAM Role para instâncias ECS
+resource "aws_iam_role" "ecs_instance_role" {
+  name = "ecs_instance_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# Política de permissões para ECS Role
+resource "aws_iam_policy_attachment" "ecs_instance_policy" {
+  name       = "ecs_instance_policy_attachment"
+  roles      = [aws_iam_role.ecs_instance_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
+# IAM Instance Profile
+resource "aws_iam_instance_profile" "ecs_instance_profile" {
+  name = "ecs_instance_profile"
+  role = aws_iam_role.ecs_instance_role.name
+}
+
+# Launch Configuration para ECS
+resource "aws_launch_configuration" "ecs_launch_config" {
+  depends_on         = [aws_iam_instance_profile.ecs_instance_profile]
+  name               = "ms-clientes-launch-config"
+  image_id           = "ami-0c02fb55956c7d316" # Substitua pela AMI otimizada para ECS na us-east-2
+  instance_type      = "t3.medium"
+  iam_instance_profile = aws_iam_instance_profile.ecs_instance_profile.name
+  security_groups    = [aws_security_group.ms_clientes_ecs_sg.id]
+
+  user_data = <<-EOF
+  #!/bin/bash
+  echo ECS_CLUSTER=${aws_ecs_cluster.ms_clientes_cluster.name} >> /etc/ecs/ecs.config
+  EOF
+}
+
+# Auto Scaling Group
+resource "aws_autoscaling_group" "ecs_asg" {
+  launch_configuration = aws_launch_configuration.ecs_launch_config.id
+  min_size             = 1
+  max_size             = 3
+  desired_capacity     = 1
+  vpc_zone_identifier  = [
+    aws_subnet.ms_clientes_public_subnet.id,
+    aws_subnet.ms_clientes_public_subnet_2.id
+  ]
 }
 
 # ECS Task Definition
@@ -223,61 +286,4 @@ resource "aws_ecs_service" "ms_clientes_service" {
     Name        = "ms_Clientes-ECS-Service"
     Application = "FIAP-TechChallenge"
   }
-}
-
-# Launch Configuration
-resource "aws_launch_configuration" "ecs_launch_config" {
-  name          = "ms-clientes-launch-config"
-  image_id      = "ami-0c02fb55956c7d316" # Substitua pela AMI ECS otimizada
-  instance_type = "t3.medium" # Aumentado para 2 vCPUs e 4 GB RAM
-  iam_instance_profile = aws_iam_instance_profile.ecs_instance_profile.name
-  security_groups = [aws_security_group.ms_clientes_ecs_sg.id]
-
-  user_data = <<-EOF
-  #!/bin/bash
-  echo ECS_CLUSTER=${aws_ecs_cluster.ms_clientes_cluster.name} >> /etc/ecs/ecs.config
-  EOF
-}
-
-# Auto Scaling Group
-resource "aws_autoscaling_group" "ecs_asg" {
-  launch_configuration = aws_launch_configuration.ecs_launch_config.id
-  min_size             = 1
-  max_size             = 3
-  desired_capacity     = 1
-  vpc_zone_identifier  = [
-    aws_subnet.ms_clientes_public_subnet.id,
-    aws_subnet.ms_clientes_public_subnet_2.id
-  ]
-}
-
-# IAM Role para ECS
-resource "aws_iam_role" "ecs_instance_role" {
-  name = "ecs_instance_role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
-# Política de ECS para EC2
-resource "aws_iam_policy_attachment" "ecs_instance_policy" {
-  name       = "ecs_instance_policy_attachment"
-  roles      = [aws_iam_role.ecs_instance_role.name]
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
-}
-
-# Instance Profile
-resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "ecs_instance_profile"
-  role = aws_iam_role.ecs_instance_role.name
 }
