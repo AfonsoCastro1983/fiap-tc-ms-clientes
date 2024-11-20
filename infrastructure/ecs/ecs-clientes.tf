@@ -62,8 +62,8 @@ resource "aws_security_group" "ms_clientes_ecs_sg" {
   vpc_id = aws_vpc.ms_clientes_vpc.id
 
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = 8000
+    to_port     = 8000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -94,7 +94,7 @@ resource "aws_subnet" "ms_clientes_public_subnet_2" {
   }
 }
 
-# Atualização no Load Balancer
+# Load Balancer
 resource "aws_lb" "ms_clientes_ecs_lb" {
   name               = "ms-clientes-ecs-lb"
   internal           = false
@@ -126,7 +126,7 @@ resource "aws_lb_listener" "ms_clientes_ecs_lb_listener" {
 # Target Group
 resource "aws_lb_target_group" "ms_clientes_ecs_target_group" {
   name        = "ms-clientes-ecs-target-group"
-  port        = 80
+  port        = 8000
   protocol    = "HTTP"
   vpc_id      = aws_vpc.ms_clientes_vpc.id
   target_type = "instance"
@@ -161,8 +161,8 @@ resource "aws_ecs_task_definition" "ms_clientes_task" {
   family                   = "ms_Clientes-task"
   network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = "1024" # 1 vCPU
+  memory                   = "2048" # 2 GB RAM
 
   container_definitions = jsonencode([{
     name      = "fiap-msclientes-app"
@@ -170,8 +170,8 @@ resource "aws_ecs_task_definition" "ms_clientes_task" {
     essential = true
     portMappings = [
       {
-        containerPort = 80
-        hostPort      = 80
+        containerPort = 8000
+        hostPort      = 8000
         protocol      = "tcp"
       }
     ]
@@ -216,11 +216,76 @@ resource "aws_ecs_service" "ms_clientes_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.ms_clientes_ecs_target_group.arn
     container_name   = "fiap-msclientes-app"
-    container_port   = 80
+    container_port   = 8000
   }
 
   tags = {
     Name        = "ms_Clientes-ECS-Service"
     Application = "FIAP-TechChallenge"
   }
+}
+
+# Launch Configuration
+resource "aws_launch_configuration" "ecs_launch_config" {
+  name          = "ms-clientes-launch-config"
+  image_id      = "ami-0c02fb55956c7d316" # Substitua pela AMI ECS otimizada
+  instance_type = "t3.medium" # Aumentado para 2 vCPUs e 4 GB RAM
+  iam_instance_profile = aws_iam_instance_profile.ecs_instance_profile.name
+  security_groups = [aws_security_group.ms_clientes_ecs_sg.id]
+
+  user_data = <<-EOF
+  #!/bin/bash
+  echo ECS_CLUSTER=${aws_ecs_cluster.ms_clientes_cluster.name} >> /etc/ecs/ecs.config
+  EOF
+}
+
+# Auto Scaling Group
+resource "aws_autoscaling_group" "ecs_asg" {
+  launch_configuration = aws_launch_configuration.ecs_launch_config.id
+  min_size             = 1
+  max_size             = 3
+  desired_capacity     = 1
+  vpc_zone_identifier  = [
+    aws_subnet.ms_clientes_public_subnet.id,
+    aws_subnet.ms_clientes_public_subnet_2.id
+  ]
+
+  tags = [
+    {
+      key                 = "Name"
+      value               = "ms-clientes-ecs-instance"
+      propagate_at_launch = true
+    }
+  ]
+}
+
+# IAM Role para ECS
+resource "aws_iam_role" "ecs_instance_role" {
+  name = "ecs_instance_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# Política de ECS para EC2
+resource "aws_iam_policy_attachment" "ecs_instance_policy" {
+  name       = "ecs_instance_policy_attachment"
+  roles      = [aws_iam_role.ecs_instance_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
+# Instance Profile
+resource "aws_iam_instance_profile" "ecs_instance_profile" {
+  name = "ecs_instance_profile"
+  role = aws_iam_role.ecs_instance_role.name
 }
