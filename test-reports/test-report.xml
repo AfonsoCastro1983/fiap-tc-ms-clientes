@@ -1,8 +1,8 @@
 <testExecutions version="1">
 <file path="tests/CPF.test.ts">
-<testCase name="CPF deve criar uma inst&#xe2;ncia com CPF v&#xe1;lido" duration="3" />
-<testCase name="CPF deve lan&#xe7;ar erro para CPF com menos de 11 d&#xed;gitos" duration="14" />
-<testCase name="CPF deve lan&#xe7;ar erro para CPF com mais de 11 d&#xed;gitos" duration="1" />
+<testCase name="CPF deve criar uma inst&#xe2;ncia com CPF v&#xe1;lido" duration="13" />
+<testCase name="CPF deve lan&#xe7;ar erro para CPF com menos de 11 d&#xed;gitos" duration="13" />
+<testCase name="CPF deve lan&#xe7;ar erro para CPF com mais de 11 d&#xed;gitos" duration="2" />
 <testCase name="CPF deve lan&#xe7;ar erro para CPF com todos os d&#xed;gitos iguais" duration="1" />
 <testCase name="CPF deve lan&#xe7;ar erro para CPF com d&#xed;gitos verificadores incorretos" duration="1" />
 <testCase name="CPF deve aceitar CPF com caracteres n&#xe3;o num&#xe9;ricos" duration="0" />
@@ -10,29 +10,29 @@
 <testCase name="CPF deve lan&#xe7;ar erro para CPF com apenas espa&#xe7;os" duration="1" />
 </file>
 <file path="tests/ClienteGateway.test.ts">
-<testCase name="ClienteGateway deve salvar um cliente com sucesso" duration="23" />
-<testCase name="ClienteGateway deve buscar um cliente por CPF com sucesso" duration="1" />
-<testCase name="ClienteGateway deve retornar cliente zerado ao buscar por CPF inexistente" duration="1" />
+<testCase name="ClienteGateway deve salvar um cliente com sucesso" duration="13" />
+<testCase name="ClienteGateway deve buscar um cliente por CPF com sucesso" duration="0" />
+<testCase name="ClienteGateway deve retornar cliente zerado ao buscar por CPF inexistente" duration="2" />
 <testCase name="ClienteGateway deve buscar um cliente por e-mail com sucesso" duration="1" />
-<testCase name="ClienteGateway deve buscar um cliente por token JWT com sucesso" duration="2" />
-<testCase name="ClienteGateway deve retornar cliente zerado ao buscar por token JWT inexistente" duration="2" />
+<testCase name="ClienteGateway deve buscar um cliente por token JWT com sucesso" duration="4" />
+<testCase name="ClienteGateway deve retornar cliente zerado ao buscar por token JWT inexistente" duration="3" />
 </file>
 <file path="tests/CadastrarClienteUseCase.test.ts">
-<testCase name="CadastrarClienteUseCase deve cadastrar um cliente com dados v&#xe1;lidos" duration="7" />
-<testCase name="CadastrarClienteUseCase deve retornar erro ao salvar cliente com CPF j&#xe1; existente" duration="6" />
-<testCase name="CadastrarClienteUseCase deve buscar cliente por CPF" duration="0" />
+<testCase name="CadastrarClienteUseCase deve cadastrar um cliente com dados v&#xe1;lidos" duration="10" />
+<testCase name="CadastrarClienteUseCase deve retornar erro ao salvar cliente com CPF j&#xe1; existente" duration="9" />
+<testCase name="CadastrarClienteUseCase deve buscar cliente por CPF" duration="4" />
 <testCase name="CadastrarClienteUseCase deve retornar um cliente zerado ao buscar cliente por CPF inexistente" duration="1" />
-<testCase name="CadastrarClienteUseCase deve buscar um cliente por e-mail com sucesso" duration="1" />
-<testCase name="CadastrarClienteUseCase deve retornar um cliente zerado ao buscar por e-mail inexistente" duration="0" />
+<testCase name="CadastrarClienteUseCase deve buscar um cliente por e-mail com sucesso" duration="2" />
+<testCase name="CadastrarClienteUseCase deve retornar um cliente zerado ao buscar por e-mail inexistente" duration="2" />
 <testCase name="CadastrarClienteUseCase deve buscar um cliente por ID com sucesso" duration="1" />
 <testCase name="CadastrarClienteUseCase deve retornar um cliente zerado ao buscar por ID inexistente" duration="1" />
 </file>
 <file path="tests/ClienteController.test.ts">
-<testCase name="ClienteController deve salvar um cliente com sucesso" duration="15" />
-<testCase name="ClienteController deve criar um cliente sem CPF e e-mail com sucesso" duration="1" />
+<testCase name="ClienteController deve salvar um cliente com sucesso" duration="12" />
+<testCase name="ClienteController deve criar um cliente sem CPF e e-mail com sucesso" duration="2" />
 <testCase name="ClienteController deve buscar cliente por CPF com sucesso" duration="1" />
 <testCase name="ClienteController deve retornar um cliente zerado ao buscar por CPF inexistente" duration="0" />
 <testCase name="ClienteController deve buscar cliente por e-mail com sucesso" duration="1" />
-<testCase name="ClienteController deve retornar um cliente zerado ao buscar por e-mail inexistente" duration="0" />
+<testCase name="ClienteController deve retornar um cliente zerado ao buscar por e-mail inexistente" duration="1" />
 </file>
 </testExecutions>
