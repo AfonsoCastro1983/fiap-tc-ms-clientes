@@ -9,6 +9,11 @@ module.exports = {
   },
   collectCoverage: true,
   coverageDirectory: "coverage",
+  collectCoverageFrom: [
+    "src/**/*.{ts,tsx}",
+    "!src/index.ts",
+    "!src/infra/http/routes/*.ts"
+  ],
   coverageReporters: ["json", "lcov", "text", "clover"],
   coverageThreshold: {
     global: {
