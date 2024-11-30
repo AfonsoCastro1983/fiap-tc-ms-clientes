@@ -18,7 +18,7 @@ const cpfValue = '93941938045';
 const emailValue = 'joao@email.com';
 const cognitoValue = 'cognito123';
 
-describe('ClienteController', () => {
+describe('Controller de Clientes', () => {
   let clienteController: ClienteController;
   let clienteGatewayMock: jest.Mocked<ClienteGateway>;
 
@@ -27,119 +27,166 @@ describe('ClienteController', () => {
     clienteController = new ClienteController(clienteGatewayMock);
   });
 
-  it('deve salvar um cliente com sucesso', async () => {
-    const mockCliente = new Cliente(idValue, nomeValue, new Email(emailValue), new CPF(cpfValue), cognitoValue);
-    const mockResponse = {
-      id: idValue,
-      nome: nomeValue,
-      cpf: cpfValue,
-      email: emailValue,
-    };
+  describe("Cenário: Salvar um cliente com sucesso", () => {
+    it("DADO um cliente com dados válidos, QUANDO eu tentar salvá-lo, ENTÃO o cliente deve ser salvo com sucesso", async () => {
+      const mockCliente = new Cliente(idValue, nomeValue, new Email(emailValue), new CPF(cpfValue), cognitoValue);
+      const mockResponse = {
+        id: idValue,
+        nome: nomeValue,
+        cpf: cpfValue,
+        email: emailValue,
+      };
 
-    clienteGatewayMock.salvar.mockResolvedValue(mockCliente);
+      clienteGatewayMock.salvar.mockResolvedValue(mockCliente);
 
-    const response = await clienteController.salvarCliente({
-      nome: mockCliente.nome,
-      cpf: cpfValue,
-      email: emailValue,
-      idcognito: mockCliente.idcognito,
+      const response = await clienteController.salvarCliente({
+        nome: mockCliente.nome,
+        cpf: cpfValue,
+        email: emailValue,
+        idcognito: mockCliente.idcognito,
+      });
+
+      // Validação do formato de resposta simplificado
+      expect(response).toEqual(mockResponse);
+
+      // Comparação usando valores extraídos dos getters
+      expect(clienteGatewayMock.salvar).toHaveBeenCalledWith(expect.objectContaining(mockCliente));
     });
-
-    // Validação do formato de resposta simplificado
-    expect(response).toEqual(mockResponse);
-
-    // Comparação usando valores extraídos dos getters
-    expect(clienteGatewayMock.salvar).toHaveBeenCalledWith(expect.objectContaining(mockCliente));
   });
 
-  it('deve criar um cliente sem CPF e e-mail com sucesso', async () => {
-    const mockCliente = new Cliente(idValue, nomeValue, undefined, undefined, cognitoValue);
-    const mockResponse = {
-      id: 0,
-      nome: mockCliente.nome,
-      cpf: '',
-      email: ''
-    }
+  describe("Cenário: Criar um cliente sem CPF e e-mail com sucesso", () => {
+    it("DADO um cliente sem CPF e e-mail, QUANDO eu tentar salvá-lo, ENTÃO o cliente deve ser salvo com sucesso", async () => {
+      const mockCliente = new Cliente(idValue, nomeValue, undefined, undefined, cognitoValue);
+      const mockResponse = {
+        id: 0,
+        nome: mockCliente.nome,
+        cpf: '',
+        email: ''
+      }
 
-    clienteGatewayMock.salvar.mockResolvedValue(mockCliente);
+      clienteGatewayMock.salvar.mockResolvedValue(mockCliente);
 
-    const response = await clienteController.salvarCliente({
-      nome: mockCliente.nome,
-      cpf: '',
-      email: '',
-      idcognito: mockCliente.idcognito
+      const response = await clienteController.salvarCliente({
+        nome: mockCliente.nome,
+        cpf: '',
+        email: '',
+        idcognito: mockCliente.idcognito
+      });
+
+      // Validação do formato de resposta simplificado
+      expect(response).toEqual(mockResponse);
+
+      // Comparação usando valores extraídos dos getters
+      expect(clienteGatewayMock.salvar).toHaveBeenCalledWith(expect.objectContaining(mockCliente));
     });
-
-    // Validação do formato de resposta simplificado
-    expect(response).toEqual(mockResponse);
-
-    // Comparação usando valores extraídos dos getters
-    expect(clienteGatewayMock.salvar).toHaveBeenCalledWith(expect.objectContaining(mockCliente));
   });
 
-  it('deve buscar cliente por CPF com sucesso', async () => {
-    const mockCliente = new Cliente(idValue, nomeValue, new Email(emailValue), new CPF(cpfValue), cognitoValue);
-
-    clienteGatewayMock.buscarPorCPF.mockResolvedValue(mockCliente);
-
-    const response = await clienteController.buscarCPF(cpfValue);
-
-    // Comparar apenas as propriedades relevantes
-    expect(response).toEqual({
-      id: mockCliente.id,
-      nome: mockCliente.nome,
-      cpf: mockCliente.cpf?.value || '',
-      email: mockCliente.email?.value || '',
+  describe("Cenário: Cadastrar cliente com um e-mail inválido", () => {
+    it("DADO um novo cadastro, QUANDO eu inserir um e-mail muito longo, ENTÃO dovo receber uma mensagem 'Email muito longo'", async () => {
+      await expect(
+        clienteController.salvarCliente({
+          nome: nomeValue,
+          cpf: cpfValue,
+          email: 'meunomecompletousandomuitaspalavrasenumeros12345@meudominioextensamentecomprido.com.br',
+          idcognito: cognitoValue
+        })
+      ).rejects.toThrow('Email muito longo');
     });
-    expect(clienteGatewayMock.buscarPorCPF).toHaveBeenCalledWith(cpfValue);
+
+    it("DADO um novo cadastro, QUANDO eu inserir um e-mail com domínio muito longo, ENTÃO dovo receber uma mensagem 'Parte local do email muito longa'", async () => {
+      await expect(
+        clienteController.salvarCliente({
+          nome: nomeValue,
+          cpf: cpfValue,
+          email: 'nome@meudominioextensamentecompridousandomuitaspalavrasenumeros123.com.br',
+          idcognito: cognitoValue
+        })
+      ).rejects.toThrow('Parte local do email muito longa');
+    });
+
+    it("DADO um novo cadastro, QUANDO eu inserir um e-mail inválido, ENTÃO dovo receber uma mensagem 'Email inválido'", async () => {
+      await expect(
+        clienteController.salvarCliente({
+          nome: nomeValue,
+          cpf: cpfValue,
+          email: 'teste de e-mail',
+          idcognito: cognitoValue
+        })
+      ).rejects.toThrow('Email inválido');
+    });
   });
 
-  it('deve retornar um cliente zerado ao buscar por CPF inexistente', async () => {
-    const clienteZerado = new Cliente(0, '');
-    clienteGatewayMock.buscarPorCPF.mockResolvedValue(clienteZerado);
+  describe("Cenário: Buscar cliente por CPF com sucesso", () => {
+    it("DADO um CPF válido, QUANDO eu buscar o cliente, ENTÃO os dados do cliente devem ser retornados", async () => {
+      const mockCliente = new Cliente(idValue, nomeValue, new Email(emailValue), new CPF(cpfValue), cognitoValue);
 
-    const response = await clienteController.buscarCPF('98765432100');
+      clienteGatewayMock.buscarPorCPF.mockResolvedValue(mockCliente);
 
-    expect(response).toEqual({
-      id: 0,
-      nome: '',
-      cpf: '',
-      email: '',
+      const response = await clienteController.buscarCPF(cpfValue);
+
+      // Comparar apenas as propriedades relevantes
+      expect(response).toEqual({
+        id: mockCliente.id,
+        nome: mockCliente.nome,
+        cpf: mockCliente.cpf?.value || '',
+        email: mockCliente.email?.value || '',
+      });
+      expect(clienteGatewayMock.buscarPorCPF).toHaveBeenCalledWith(cpfValue);
     });
-    expect(clienteGatewayMock.buscarPorCPF).toHaveBeenCalledWith('98765432100');
   });
 
-  it('deve buscar cliente por e-mail com sucesso', async () => {
-    const mockCliente = new Cliente(idValue, nomeValue, new Email(emailValue), new CPF(cpfValue), cognitoValue);
+  describe("Cenário: Retornar cliente zerado ao buscar por CPF inexistente", () => {
+    it("DADO um CPF inexistente, QUANDO eu buscar o cliente, ENTÃO deve retornar um cliente com dados zerados", async () => {
+      const clienteZerado = new Cliente(0, '');
+      clienteGatewayMock.buscarPorCPF.mockResolvedValue(clienteZerado);
 
-    clienteGatewayMock.buscarPorEmail.mockResolvedValue(mockCliente);
+      const response = await clienteController.buscarCPF('98765432100');
 
-    const response = await clienteController.buscarEmail(emailValue);
-
-    // Comparar apenas as propriedades relevantes
-    expect(response).toEqual({
-      id: mockCliente.id,
-      nome: mockCliente.nome,
-      cpf: mockCliente.cpf?.value || '',
-      email: mockCliente.email?.value || '',
+      expect(response).toEqual({
+        id: 0,
+        nome: '',
+        cpf: '',
+        email: '',
+      });
+      expect(clienteGatewayMock.buscarPorCPF).toHaveBeenCalledWith('98765432100');
     });
-    expect(clienteGatewayMock.buscarPorEmail).toHaveBeenCalledWith(emailValue);
   });
 
-  it('deve retornar um cliente zerado ao buscar por e-mail inexistente', async () => {
-    const clienteZerado = new Cliente(0, '');
+  describe("Cenário: Buscar cliente por e-mail com sucesso", () => {
+    it("DADO um e-mail válido, QUANDO eu buscar o cliente, ENTÃO os dados do cliente devem ser retornados", async () => {
+      const mockCliente = new Cliente(idValue, nomeValue, new Email(emailValue), new CPF(cpfValue), cognitoValue);
 
-    clienteGatewayMock.buscarPorEmail.mockResolvedValue(clienteZerado);
+      clienteGatewayMock.buscarPorEmail.mockResolvedValue(mockCliente);
 
-    const response = await clienteController.buscarEmail('naoexiste@email.com');
+      const response = await clienteController.buscarEmail(emailValue);
 
-    expect(response).toEqual({
-      id: 0,
-      nome: '',
-      cpf: '',
-      email: '',
+      // Comparar apenas as propriedades relevantes
+      expect(response).toEqual({
+        id: mockCliente.id,
+        nome: mockCliente.nome,
+        cpf: mockCliente.cpf?.value || '',
+        email: mockCliente.email?.value || '',
+      });
+      expect(clienteGatewayMock.buscarPorEmail).toHaveBeenCalledWith(emailValue);
     });
-    expect(clienteGatewayMock.buscarPorEmail).toHaveBeenCalledWith('naoexiste@email.com');
+  });
+
+  describe("Cenário: Retornar cliente zerado ao buscar por e-mail inexistente", () => {
+    it("DADO um e-mail inexistente, QUANDO eu buscar o cliente, ENTÃO deve retornar um cliente com dados zerados", async () => {
+      const clienteZerado = new Cliente(0, '');
+
+      clienteGatewayMock.buscarPorEmail.mockResolvedValue(clienteZerado);
+
+      const response = await clienteController.buscarEmail('naoexiste@email.com');
+
+      expect(response).toEqual({
+        id: 0,
+        nome: '',
+        cpf: '',
+        email: '',
+      });
+      expect(clienteGatewayMock.buscarPorEmail).toHaveBeenCalledWith('naoexiste@email.com');
+    });
   });
 
 });

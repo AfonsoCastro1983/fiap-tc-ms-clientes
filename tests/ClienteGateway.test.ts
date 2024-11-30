@@ -22,7 +22,7 @@ const cpfValue = '93941938045';
 const emailValue = 'joao@email.com';
 const cognitoValue = 'cognito123';
 
-describe('ClienteGateway', () => {
+describe('Gateway de Clientes', () => {
   let clienteGateway: ClienteGateway;
   const mockRepository = {
     findOneBy: jest.fn(),
@@ -34,99 +34,168 @@ describe('ClienteGateway', () => {
     clienteGateway = new ClienteGateway();
   });
 
-  it('deve salvar um cliente com sucesso', async () => {
-    const cliente = new Cliente(idValue, nomeValue, new Email(emailValue), new CPF(cpfValue), cognitoValue);
-    const savedCliente = new ClienteRepository();
-    savedCliente.id = 1;
-    savedCliente.nome = nomeValue;
-    savedCliente.email = emailValue;
-    savedCliente.cpf = cpfValue;
-    mockRepository.save.mockResolvedValue(savedCliente);
+  describe("Cenário: Salvar um cliente com sucesso", () => {
+    it("DADO um cliente com dados válidos, QUANDO eu tentar salvá-lo, ENTÃO o cliente deve ser salvo com sucesso", async () => {
+      const cliente = new Cliente(idValue, nomeValue, new Email(emailValue), new CPF(cpfValue), cognitoValue);
+      const savedCliente = new ClienteRepository();
+      savedCliente.id = 1;
+      savedCliente.nome = nomeValue;
+      savedCliente.email = emailValue;
+      savedCliente.cpf = cpfValue;
+      mockRepository.save.mockResolvedValue(savedCliente);
 
-    const result = await clienteGateway.salvar(cliente);
+      const result = await clienteGateway.salvar(cliente);
 
-    expect(result.id).toBe(1);
-    expect(result.nome).toBe(nomeValue);
-    expect(mockRepository.save).toHaveBeenCalledWith(expect.objectContaining({
-      nome: nomeValue,
-      email: emailValue,
-      cpf: cpfValue,
-    }));
+      expect(result.id).toBe(1);
+      expect(result.nome).toBe(nomeValue);
+      expect(mockRepository.save).toHaveBeenCalledWith(expect.objectContaining({
+        nome: nomeValue,
+        email: emailValue,
+        cpf: cpfValue,
+      }));
+    });
   });
 
-  it('deve buscar um cliente por CPF com sucesso', async () => {
-    const mockCliente = new ClienteRepository();
-    mockCliente.id = 1;
-    mockCliente.nome = nomeValue;
-    mockCliente.cpf = cpfValue;
-    mockCliente.email = emailValue;
+  describe("Cenário: Atualizar um cliente quando o CPF já existir", () => {
+    it("DADO um CPF válido e já existente, QUANDO eu salvar um cliente, ENTÃO deverá ser atualizado o cliente já gravado", async() => {
+      const cliente = new Cliente(idValue, 'Novo Nome', new Email(emailValue), new CPF(cpfValue), cognitoValue);
+      const savedCliente = new ClienteRepository();
+      savedCliente.id = 1;
+      savedCliente.nome = nomeValue;
+      savedCliente.email = emailValue;
+      savedCliente.cpf = cpfValue;
+      const updatedCliente = new ClienteRepository();
+      savedCliente.id = 1;
+      savedCliente.nome = 'Novo Nome';
+      savedCliente.email = emailValue;
+      savedCliente.cpf = cpfValue;
+      mockRepository.findOneBy.mockResolvedValue(savedCliente);      
+      mockRepository.save.mockResolvedValue(updatedCliente);
 
-    mockRepository.findOneBy.mockResolvedValue(mockCliente);
+      const result = await clienteGateway.salvar(cliente);
 
-    const result = await clienteGateway.buscarPorCPF(cpfValue);
-
-    expect(result.id).toBe(1);
-    expect(result.nome).toBe(nomeValue);
-    expect(mockRepository.findOneBy).toHaveBeenCalledWith({ cpf: cpfValue });
+      expect(result.id).toBe(1);
+      expect(result.nome).toBe('Novo Nome');
+      expect(mockRepository.save).toHaveBeenCalledWith(expect.objectContaining({
+        nome: nomeValue,
+        email: emailValue,
+        cpf: cpfValue,
+      }));
+    });
   });
 
-  it('deve retornar cliente zerado ao buscar por CPF inexistente', async () => {
-    mockRepository.findOneBy.mockResolvedValue(null);
+  describe("Cenário: Buscar um cliente por CPF com sucesso", () => {
+    it("DADO um CPF válido, QUANDO eu buscar o cliente, ENTÃO os dados do cliente devem ser retornados", async () => {
+      const mockCliente = new ClienteRepository();
+      mockCliente.id = 1;
+      mockCliente.nome = nomeValue;
+      mockCliente.cpf = cpfValue;
+      mockCliente.email = emailValue;
 
-    const result = await clienteGateway.buscarPorCPF('00000000000');
+      mockRepository.findOneBy.mockResolvedValue(mockCliente);
 
-    expect(result.id).toBe(0);
-    expect(result.nome).toBe('');
-    expect(mockRepository.findOneBy).toHaveBeenCalledWith({ cpf: '00000000000' });
+      const result = await clienteGateway.buscarPorCPF(cpfValue);
+
+      expect(result.id).toBe(1);
+      expect(result.nome).toBe(nomeValue);
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ cpf: cpfValue });
+    });
   });
 
-  it('deve buscar um cliente por e-mail com sucesso', async () => {
-    const mockCliente = new ClienteRepository();
-    mockCliente.id = 1;
-    mockCliente.nome = nomeValue;
-    mockCliente.cpf = cpfValue;
-    mockCliente.email = emailValue;
+  describe("Cenário: Retornar cliente zerado ao buscar por CPF inexistente", () => {
+    it("DADO um CPF inexistente, QUANDO eu buscar o cliente, ENTÃO deve retornar um cliente com dados zerados", async () => {
+      mockRepository.findOneBy.mockResolvedValue(null);
 
-    mockRepository.findOneBy.mockResolvedValue(mockCliente);
+      const result = await clienteGateway.buscarPorCPF('00000000000');
 
-    const result = await clienteGateway.buscarPorEmail(emailValue);
-
-    expect(result.id).toBe(1);
-    expect(result.nome).toBe(nomeValue);
-    expect(mockRepository.findOneBy).toHaveBeenCalledWith({ email: emailValue });
+      expect(result.id).toBe(0);
+      expect(result.nome).toBe('');
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ cpf: '00000000000' });
+    });
   });
 
-  it('deve buscar um cliente por token JWT com sucesso', async () => {
-    const decodedToken = { sub: cognitoValue };
-    const mockCliente = new ClienteRepository();
-    mockCliente.id = 1;
-    mockCliente.nome = nomeValue;
-    mockCliente.cpf = cpfValue;
-    mockCliente.email = emailValue;
-    mockCliente.idcognito = cognitoValue;
+  describe("Cenário: Buscar um cliente por e-mail com sucesso", () => {
+    it("DADO um e-mail válido, QUANDO eu buscar o cliente, ENTÃO os dados do cliente devem ser retornados", async () => {
+      const mockCliente = new ClienteRepository();
+      mockCliente.id = 1;
+      mockCliente.nome = nomeValue;
+      mockCliente.cpf = cpfValue;
+      mockCliente.email = emailValue;
 
-    (jwt.decode as jest.Mock).mockReturnValue(decodedToken);
-    mockRepository.findOneBy.mockResolvedValue(mockCliente);
+      mockRepository.findOneBy.mockResolvedValue(mockCliente);
 
-    const result = await clienteGateway.buscarPorToken('Bearer mock-token');
+      const result = await clienteGateway.buscarPorEmail(emailValue);
 
-    expect(result.id).toBe(1);
-    expect(result.nome).toBe(nomeValue);
-    expect(jwt.decode).toHaveBeenCalledWith('mock-token');
-    expect(mockRepository.findOneBy).toHaveBeenCalledWith({ idcognito: cognitoValue });
+      expect(result.id).toBe(1);
+      expect(result.nome).toBe(nomeValue);
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ email: emailValue });
+    });
   });
 
-  it('deve retornar cliente zerado ao buscar por token JWT inexistente', async () => {
-    const decodedToken = { sub: cognitoValue };
+  describe("Cenário: Buscar um cliente por um ID com sucesso", () => {
+    it("DADO um ID válido, QUANDO eu buscar o cliente, ENTÃO os dados do cliente devem ser retornados", async () => {
+      const mockCliente = new ClienteRepository();
+      mockCliente.id = 1;
+      mockCliente.nome = nomeValue;
+      mockCliente.cpf = cpfValue;
+      mockCliente.email = emailValue;
 
-    (jwt.decode as jest.Mock).mockReturnValue(decodedToken);
-    mockRepository.findOneBy.mockResolvedValue(null);
+      mockRepository.findOneBy.mockResolvedValue(mockCliente);
 
-    const result = await clienteGateway.buscarPorToken('Bearer mock-token');
+      const result = await clienteGateway.buscarPorID(1);
 
-    expect(result.id).toBe(0);
-    expect(result.nome).toBe('');
-    expect(jwt.decode).toHaveBeenCalledWith('mock-token');
-    expect(mockRepository.findOneBy).toHaveBeenCalledWith({ idcognito: cognitoValue });
+      expect(result.id).toBe(1);
+      expect(result.nome).toBe(nomeValue);
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: 1 });
+    });
+  });
+
+  describe("Cenário: Buscar um cliente por um ID inválido", () => {
+    it("DADO um ID inválido, QUANDO eu buscar o cliente, ENTÃO retornará um cliente zerado", async () => {
+      mockRepository.findOneBy.mockResolvedValue(null);
+
+      const result = await clienteGateway.buscarPorID(1);
+
+      expect(result.id).toBe(0);
+      expect(result.nome).toBe('');
+    });
+  });
+
+  describe("Cenário: Buscar um cliente por token JWT com sucesso", () => {
+    it("DADO um token JWT válido, QUANDO eu buscar o cliente, ENTÃO os dados do cliente devem ser retornados", async () => {
+      const decodedToken = { sub: cognitoValue };
+      const mockCliente = new ClienteRepository();
+      mockCliente.id = 1;
+      mockCliente.nome = nomeValue;
+      mockCliente.cpf = cpfValue;
+      mockCliente.email = emailValue;
+      mockCliente.idcognito = cognitoValue;
+
+      (jwt.decode as jest.Mock).mockReturnValue(decodedToken);
+      mockRepository.findOneBy.mockResolvedValue(mockCliente);
+
+      const result = await clienteGateway.buscarPorToken('Bearer mock-token');
+
+      expect(result.id).toBe(1);
+      expect(result.nome).toBe(nomeValue);
+      expect(jwt.decode).toHaveBeenCalledWith('mock-token');
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ idcognito: cognitoValue });
+    });
+  });
+
+  describe("Cenário: Retornar cliente zerado ao buscar por token JWT inexistente", () => {
+    it("DADO um token JWT inexistente, QUANDO eu buscar o cliente, ENTÃO deve retornar um cliente com dados zerados", async () => {
+      const decodedToken = { sub: cognitoValue };
+
+      (jwt.decode as jest.Mock).mockReturnValue(decodedToken);
+      mockRepository.findOneBy.mockResolvedValue(null);
+
+      const result = await clienteGateway.buscarPorToken('Bearer mock-token');
+
+      expect(result.id).toBe(0);
+      expect(result.nome).toBe('');
+      expect(jwt.decode).toHaveBeenCalledWith('mock-token');
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ idcognito: cognitoValue });
+    });
   });
 });

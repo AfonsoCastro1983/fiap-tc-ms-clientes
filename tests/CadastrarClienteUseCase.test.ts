@@ -21,100 +21,118 @@ describe('CadastrarClienteUseCase', () => {
     cadastrarClienteUseCase = new CadastrarClienteUseCase(clienteGatewayMock);
   });
 
-  it('deve cadastrar um cliente com dados válidos', async () => {
-    const mockCliente = new Cliente(idValue, nomeValue, undefined, undefined, idcognitoValue);
-    clienteGatewayMock.salvar.mockResolvedValue(mockCliente);
 
-    const dto = {
-      nome: nomeValue,
-      idcognito: idcognitoValue,
-      email: emailValue,
-      cpf: cpfValue,
-    };
+  describe("Cenário: Cadastrar um cliente com dados válidos", () => {
+    it("DADO um cliente com dados válidos, QUANDO eu tentar cadastrá-lo, ENTÃO o cliente deve ser salvo com sucesso", async () => {
 
-    const cliente = await cadastrarClienteUseCase.execute(dto);
+      const mockCliente = new Cliente(idValue, nomeValue, undefined, undefined, idcognitoValue);
+      clienteGatewayMock.salvar.mockResolvedValue(mockCliente);
 
-    expect(cliente).toEqual(mockCliente);
-    expect(clienteGatewayMock.salvar).toHaveBeenCalledWith(expect.objectContaining({
-      nome: 'João Silva',
-      idcognito: 'cognito123',
-    }));
+      const dto = {
+        nome: nomeValue,
+        idcognito: idcognitoValue,
+        email: emailValue,
+        cpf: cpfValue,
+      };
+
+      const cliente = await cadastrarClienteUseCase.execute(dto);
+
+      expect(cliente).toEqual(mockCliente);
+      expect(clienteGatewayMock.salvar).toHaveBeenCalledWith(expect.objectContaining({
+        nome: 'João Silva',
+        idcognito: 'cognito123',
+      }));
+    });
   });
 
-  it('deve retornar erro ao salvar cliente com CPF já existente', async () => {
-    clienteGatewayMock.salvar.mockRejectedValue(new Error('CPF já cadastrado'));
+  describe("Cenário: Retornar erro ao cadastrar cliente com CPF já existente", () => {
+    it("DADO um cliente com CPF já cadastrado, QUANDO eu tentar cadastrá-lo, ENTÃO deve lançar um erro informando que o CPF já existe", async () => {
+      clienteGatewayMock.salvar.mockRejectedValue(new Error('CPF já cadastrado'));
 
-    const dto = {
-      nome: nomeValue,
-      idcognito: idcognitoValue,
-      email: emailValue,
-      cpf: cpfValue,
-    };
+      const dto = {
+        nome: nomeValue,
+        idcognito: idcognitoValue,
+        email: emailValue,
+        cpf: cpfValue,
+      };
 
-    await expect(cadastrarClienteUseCase.execute(dto)).rejects.toThrow('CPF já cadastrado');
+      await expect(cadastrarClienteUseCase.execute(dto)).rejects.toThrow('CPF já cadastrado');
+    });
   });
 
-  it('deve buscar cliente por CPF', async () => {
-    const mockCliente = new Cliente(idValue, nomeValue, undefined, undefined, idcognitoValue);
-    clienteGatewayMock.buscarPorCPF.mockResolvedValue(mockCliente);
+  describe("Cenário: Buscar um cliente por CPF com sucesso", () => {
+    it("DADO um CPF válido, QUANDO eu buscar o cliente, ENTÃO os dados do cliente devem ser retornados", async () => {
+      const mockCliente = new Cliente(idValue, nomeValue, undefined, undefined, idcognitoValue);
+      clienteGatewayMock.buscarPorCPF.mockResolvedValue(mockCliente);
 
-    const cliente = await cadastrarClienteUseCase.buscarPorCPF(cpfValue);
+      const cliente = await cadastrarClienteUseCase.buscarPorCPF(cpfValue);
 
-    expect(cliente).toEqual(mockCliente);
-    expect(clienteGatewayMock.buscarPorCPF).toHaveBeenCalledWith(cpfValue);
+      expect(cliente).toEqual(mockCliente);
+      expect(clienteGatewayMock.buscarPorCPF).toHaveBeenCalledWith(cpfValue);
+    });
   });
 
-  it('deve retornar um cliente zerado ao buscar cliente por CPF inexistente', async () => {
-    const clienteZerado = new Cliente(0, '');
-    clienteGatewayMock.buscarPorCPF.mockResolvedValue(clienteZerado);
+  describe("Cenário: Retornar cliente zerado ao buscar por CPF inexistente", () => {
+    it("DADO um CPF inexistente, QUANDO eu buscar o cliente, ENTÃO deve retornar um cliente com dados zerados", async () => {
+      const clienteZerado = new Cliente(0, '');
+      clienteGatewayMock.buscarPorCPF.mockResolvedValue(clienteZerado);
 
-    const cliente = await cadastrarClienteUseCase.buscarPorCPF('98765432100');
+      const cliente = await cadastrarClienteUseCase.buscarPorCPF('98765432100');
 
-    expect(cliente).toEqual(clienteZerado); // Verifica se o cliente "zerado" é retornado
-    expect(clienteGatewayMock.buscarPorCPF).toHaveBeenCalledWith('98765432100');
+      expect(cliente).toEqual(clienteZerado); // Verifica se o cliente "zerado" é retornado
+      expect(clienteGatewayMock.buscarPorCPF).toHaveBeenCalledWith('98765432100');
+    });
   });
 
-  it('deve buscar um cliente por e-mail com sucesso', async () => {
-    const mockCliente = new Cliente(1, nomeValue, new Email(emailValue), new CPF(cpfValue), idcognitoValue);
+  describe("Cenário: Buscar um cliente por e-mail com sucesso", () => {
+    it("DADO um e-mail válido, QUANDO eu buscar o cliente, ENTÃO os dados do cliente devem ser retornados", async () => {
+      const mockCliente = new Cliente(1, nomeValue, new Email(emailValue), new CPF(cpfValue), idcognitoValue);
 
-    clienteGatewayMock.buscarPorEmail.mockResolvedValue(mockCliente);
+      clienteGatewayMock.buscarPorEmail.mockResolvedValue(mockCliente);
 
-    const cliente = await cadastrarClienteUseCase.buscarPorEmail(emailValue);
+      const cliente = await cadastrarClienteUseCase.buscarPorEmail(emailValue);
 
-    expect(cliente).toEqual(mockCliente); // Compara a instância do cliente mockado
-    expect(clienteGatewayMock.buscarPorEmail).toHaveBeenCalledWith(emailValue); // Certifica-se de que o método foi chamado com o e-mail correto
+      expect(cliente).toEqual(mockCliente); // Compara a instância do cliente mockado
+      expect(clienteGatewayMock.buscarPorEmail).toHaveBeenCalledWith(emailValue); // Certifica-se de que o método foi chamado com o e-mail correto
+    });
   });
 
-  it('deve retornar um cliente zerado ao buscar por e-mail inexistente', async () => {
-    const clienteZerado = new Cliente(0, '');
+  describe("Cenário: Retornar cliente zerado ao buscar por e-mail inexistente", () => {
+    it("DADO um e-mail inexistente, QUANDO eu buscar o cliente, ENTÃO deve retornar um cliente com dados zerados", async () => {
+      const clienteZerado = new Cliente(0, '');
 
-    clienteGatewayMock.buscarPorEmail.mockResolvedValue(clienteZerado);
+      clienteGatewayMock.buscarPorEmail.mockResolvedValue(clienteZerado);
 
-    const cliente = await cadastrarClienteUseCase.buscarPorEmail('naoexiste@email.com');
+      const cliente = await cadastrarClienteUseCase.buscarPorEmail('naoexiste@email.com');
 
-    expect(cliente).toEqual(clienteZerado); // Compara com o cliente zerado
-    expect(clienteGatewayMock.buscarPorEmail).toHaveBeenCalledWith('naoexiste@email.com');
+      expect(cliente).toEqual(clienteZerado); // Compara com o cliente zerado
+      expect(clienteGatewayMock.buscarPorEmail).toHaveBeenCalledWith('naoexiste@email.com');
+    });
   });
 
-  it('deve buscar um cliente por ID com sucesso', async () => {
-    const mockCliente = new Cliente(idValue, nomeValue, new Email(emailValue), new CPF(cpfValue), idcognitoValue);
+  describe("Cenário: Buscar um cliente por ID com sucesso", () => {
+    it("DADO um ID válido, QUANDO eu buscar o cliente, ENTÃO os dados do cliente devem ser retornados", async () => {
+      const mockCliente = new Cliente(idValue, nomeValue, new Email(emailValue), new CPF(cpfValue), idcognitoValue);
 
-    clienteGatewayMock.buscarPorID.mockResolvedValue(mockCliente);
+      clienteGatewayMock.buscarPorID.mockResolvedValue(mockCliente);
 
-    const cliente = await cadastrarClienteUseCase.get(idValue);
+      const cliente = await cadastrarClienteUseCase.get(idValue);
 
-    expect(cliente).toEqual(mockCliente); // Compara a instância do cliente mockado
-    expect(clienteGatewayMock.buscarPorID).toHaveBeenCalledWith(idValue); // Certifica-se de que o método foi chamado com o ID correto
+      expect(cliente).toEqual(mockCliente); // Compara a instância do cliente mockado
+      expect(clienteGatewayMock.buscarPorID).toHaveBeenCalledWith(idValue); // Certifica-se de que o método foi chamado com o ID correto
+    });
   });
 
-  it('deve retornar um cliente zerado ao buscar por ID inexistente', async () => {
-    const clienteZerado = new Cliente(0, '');
+  describe("Cenário: Retornar cliente zerado ao buscar por ID inexistente", () => {
+    it("DADO um ID inexistente, QUANDO eu buscar o cliente, ENTÃO deve retornar um cliente com dados zerados", async () => {
+      const clienteZerado = new Cliente(0, '');
 
-    clienteGatewayMock.buscarPorID.mockResolvedValue(clienteZerado);
+      clienteGatewayMock.buscarPorID.mockResolvedValue(clienteZerado);
 
-    const cliente = await cadastrarClienteUseCase.get(999);
+      const cliente = await cadastrarClienteUseCase.get(999);
 
-    expect(cliente).toEqual(clienteZerado); // Compara com o cliente zerado
-    expect(clienteGatewayMock.buscarPorID).toHaveBeenCalledWith(999);
+      expect(cliente).toEqual(clienteZerado); // Compara com o cliente zerado
+      expect(clienteGatewayMock.buscarPorID).toHaveBeenCalledWith(999);
+    });
   });
 });
