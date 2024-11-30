@@ -3,6 +3,8 @@ import { ClienteGateway } from '../src/infra/database/gateways/ClienteGateway';
 import { Cliente } from '../src/domain/entities/Cliente';
 import { CPF } from '../src/shared/valueobjects/CPF';
 import { Email } from '../src/shared/valueobjects/Email';
+import { AppDataSource } from '../src/infra/database/data-source';
+import { ClienteRepository } from '../src/infra/database/repositories/Cliente';
 
 jest.mock('../src/infra/database/data-source', () => ({
   AppDataSource: {
@@ -188,5 +190,4 @@ describe('Controller de Clientes', () => {
       expect(clienteGatewayMock.buscarPorEmail).toHaveBeenCalledWith('naoexiste@email.com');
     });
   });
-
 });

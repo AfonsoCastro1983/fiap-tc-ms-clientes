@@ -37,6 +37,10 @@ export class CadastrarClienteUseCase {
         return this.clienteGateway.buscarPorEmail(email);
     }
 
+    async buscarPorToken(autorizacao: string): Promise<Cliente> {
+        return this.clienteGateway.buscarPorToken(autorizacao);
+    }
+
     async get(id: number): Promise<Cliente> {
         return this.clienteGateway.buscarPorID(id);
     }

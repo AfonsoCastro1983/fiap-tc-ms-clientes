@@ -73,7 +73,7 @@
 				"operationId": "SalvarCliente",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "Dados do cliente cadastrado",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -106,7 +106,7 @@
 				"operationId": "BuscarCPF",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "Dados do cliente",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -138,7 +138,7 @@
 				"operationId": "BuscarEmail",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "Dados do cliente",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -157,6 +157,38 @@
 					{
 						"in": "path",
 						"name": "email",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/cliente/token": {
+			"get": {
+				"operationId": "BuscarPorToken",
+				"responses": {
+					"200": {
+						"description": "Dados do cliente",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ClienteResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Busca pelo usuário do token",
+				"tags": [
+					"Cliente"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Authorization",
 						"required": true,
 						"schema": {
 							"type": "string"

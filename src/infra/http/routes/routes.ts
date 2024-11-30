@@ -52,4 +52,24 @@ router.get("/cliente/email/:email", async (req, res) => {
     }
 });
 
+///Identificação de cliente através do jwt
+router.get("/cliente/token/", async (req, res) => {
+    try {
+        const controller = new ClienteController(new ClienteGateway());
+        if (req.headers.authorization) {
+            const cliente = await controller.buscarPorToken(req.headers.authorization);
+
+            return res.status(201).send({ cliente });
+        }
+        else {
+            return res.status(500).json({ erro: 'Autorização inválida'});
+        }
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            return res.status(500).json({ erro: error.message });
+        }
+    }
+});
+
 export default router;
