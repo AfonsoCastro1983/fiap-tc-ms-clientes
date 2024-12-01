@@ -21,25 +21,9 @@ export class ClienteGateway implements IClienteGateway {
         return cli
     }
 
-    async salvar(cliente: Cliente): Promise<Cliente> {
+    private async gravarBanco(cliente: Cliente): Promise<Cliente> {
         let clienteRepository = new ClienteRepository();
         const repCliente = AppDataSource.getRepository(ClienteRepository);
-
-        if (cliente.cpf && cliente.cpf.value != "") {
-            console.log('CPF',cliente.cpf.value);
-            const cliPesqCPF = await this.buscarPorCPF(cliente.cpf.value);
-            if (cliPesqCPF && cliPesqCPF.id != 0) {
-                console.log('CPF',cliPesqCPF);
-                return cliPesqCPF;
-            }
-        }
-        if (cliente.email && cliente.email.value != "") {
-            const cliEmail = await this.buscarPorEmail(cliente.email.value);
-            if (cliEmail && cliEmail.id != 0) {
-                console.log('Email',cliEmail);
-                return cliEmail
-            }
-        }
 
         console.log('Entrou para gravar');
         let novo = new ClienteRepository();
@@ -51,6 +35,29 @@ export class ClienteGateway implements IClienteGateway {
         clienteRepository = await repCliente.save(novo);
 
         return this.gerarClientePorRepositorio(clienteRepository);
+        
+    }
+
+    async salvar(cliente: Cliente): Promise<Cliente> {
+        if (cliente.cpf && cliente.cpf.value != "") {
+            console.log('CPF',cliente.cpf.value);
+            const cliPesqCPF = await this.buscarPorCPF(cliente.cpf.value);
+            if (cliPesqCPF && cliPesqCPF.id != 0) {
+                console.log('CPF',cliPesqCPF);
+                const newCliente = new Cliente(cliPesqCPF.id,cliente.nome,cliente.email,cliente.cpf,cliPesqCPF.idcognito);
+                return this.gravarBanco(newCliente);
+            }
+        }
+        if (cliente.email && cliente.email.value != "") {
+            const cliEmail = await this.buscarPorEmail(cliente.email.value);
+            if (cliEmail && cliEmail.id != 0) {
+                console.log('Email',cliEmail);
+                const newCliente = new Cliente(cliEmail.id,cliente.nome,cliente.email,cliente.cpf,cliEmail.idcognito);
+                return this.gravarBanco(newCliente);
+            }
+        }
+
+        return this.gravarBanco(cliente);
     }
 
     async buscarPorID(id: number): Promise<Cliente> {
@@ -85,6 +92,7 @@ export class ClienteGateway implements IClienteGateway {
     }
 
     async buscarPorToken(token: string): Promise<Cliente> {
+        console.log('fdp token',token);
         token = token.replace('Bearer ','');
         
         const decoded = jwt.decode(token);

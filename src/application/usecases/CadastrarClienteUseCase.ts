@@ -5,7 +5,7 @@ import { CPF } from '../../shared/valueobjects/CPF';
 import { ClienteGateway } from '../../infra/database/gateways/ClienteGateway';
 
 export class CadastrarClienteUseCase {
-    private clienteGateway: ClienteGateway;
+    private readonly clienteGateway: ClienteGateway;
 
     constructor (clienteGateway: ClienteGateway) {
         this.clienteGateway = clienteGateway;

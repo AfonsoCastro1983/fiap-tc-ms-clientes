@@ -8,7 +8,7 @@ import { ClienteRepository } from '../src/infra/database/repositories/Cliente';
 
 jest.mock('../src/infra/database/data-source', () => ({
   AppDataSource: {
-    getRepository: jest.fn(),
+    getRepository: jest.fn()
   },
 }));
 
@@ -25,6 +25,12 @@ describe('Controller de Clientes', () => {
   let clienteGatewayMock: jest.Mocked<ClienteGateway>;
 
   beforeEach(() => {
+    const mockRepository = {
+      findOneBy: jest.fn(),
+      save: jest.fn(),
+    };
+
+    (AppDataSource.getRepository as jest.Mock).mockReturnValue(mockRepository);
     clienteGatewayMock = new ClienteGateway() as jest.Mocked<ClienteGateway>;
     clienteController = new ClienteController(clienteGatewayMock);
   });
@@ -188,6 +194,16 @@ describe('Controller de Clientes', () => {
         email: '',
       });
       expect(clienteGatewayMock.buscarPorEmail).toHaveBeenCalledWith('naoexiste@email.com');
+    });
+  });
+
+  describe("Cenário: Retornar cliente válido ao buscar por um token", () => {
+    it("DADO um Authorization de um cliente válido, QUANDO preenchido no header da chamada, ENTÃO deve retornar um cliente", async () => {
+      const token_valido = "Bearer eyJraWQiOiJqUlpDSFNBcEtRc0dYMVI5OCtVWXNqcFczQm9iUjlcL252d29ta0xGU1hLYz0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI4MWViYzVjMC0xMGUxLTcwZTEtZGViNy1lNzQ3MTUwNWZlM2UiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTIuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0yX1V2azEyQWhwZSIsImNvZ25pdG86dXNlcm5hbWUiOiJhbm9uaW1vQGFub25pbW8uY29tLmJyIiwib3JpZ2luX2p0aSI6ImI2YjI3NDI1LWJjMGMtNGM1ZC1iMjdiLWJmNTk3OWY1ZjM0NyIsImF1ZCI6IjFvMHZmcTB1ZG43NWs5MnBzcGxya283b2ppIiwiZXZlbnRfaWQiOiI3ZDBiNWQwYS05OWZiLTQ3MTItYjAzZi02NTc4MGI2OGMxZjkiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTczMzAwMjg1OCwibmFtZSI6ImFuw7RuaW1vIiwiZXhwIjoxNzMzMDA2NDU4LCJpYXQiOjE3MzMwMDI4NTgsImp0aSI6IjIxYzAzNjJmLWFlNjItNDRkZS04ODNjLWM2M2ZlMjI1MGIwMiIsImVtYWlsIjoiYW5vbmltb0Bhbm9uaW1vLmNvbS5iciJ9.IJzKivwmem7RcZ9RLyBtEFapXZ8lCObDMx5DLN0zH_jEJrRWgNXloHyFu-tdh38w6lTHgpK8fsacQaSTXbhWVEMY1kYDs_OE_dHdt23m784xulLcjUv6iFAqbgFVY592fIuOdO48NQLvQ-lmYGA1zPKBtqAcmlveqBSGaK50kVKHcHO1wPdi5sD3N-isokI9_dKXeRw34qgn2Uq2zdopr4ENZBZcBC5OnnHReSAOQd2Jmi5FzZLDTjRyAeU1ZUgZ_SqaqXwlcQmS1gAUnZNCTCXTlozvY712iLq4J3zGG8gnONBAfuHj-xJl9CyIfGW5QTL3928oRvFxhRijOaEFog";
+      
+      clienteGatewayMock.buscarPorToken.mockResolvedValue(new Cliente(1,'Novo Nome'));
+      const response = await clienteController.buscarPorToken(token_valido);
+      expect(response.id).toEqual(1);
     });
   });
 });

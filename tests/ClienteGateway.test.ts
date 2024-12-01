@@ -58,26 +58,29 @@ describe('Gateway de Clientes', () => {
 
   describe("Cenário: Atualizar um cliente quando o CPF já existir", () => {
     it("DADO um CPF válido e já existente, QUANDO eu salvar um cliente, ENTÃO deverá ser atualizado o cliente já gravado", async() => {
-      const cliente = new Cliente(idValue, 'Novo Nome', new Email(emailValue), new CPF(cpfValue), cognitoValue);
+      const novoNomeValue = 'Novo Nome';
+      const cliente = new Cliente(idValue, novoNomeValue, new Email(emailValue), new CPF(cpfValue), cognitoValue);
+      
       const savedCliente = new ClienteRepository();
       savedCliente.id = 1;
       savedCliente.nome = nomeValue;
       savedCliente.email = emailValue;
       savedCliente.cpf = cpfValue;
+      mockRepository.findOneBy.mockResolvedValue(savedCliente);
+      
       const updatedCliente = new ClienteRepository();
-      savedCliente.id = 1;
-      savedCliente.nome = 'Novo Nome';
-      savedCliente.email = emailValue;
-      savedCliente.cpf = cpfValue;
-      mockRepository.findOneBy.mockResolvedValue(savedCliente);      
+      updatedCliente.id = 1;
+      updatedCliente.nome = novoNomeValue;
+      updatedCliente.email = emailValue;
+      updatedCliente.cpf = cpfValue;      
       mockRepository.save.mockResolvedValue(updatedCliente);
 
       const result = await clienteGateway.salvar(cliente);
 
       expect(result.id).toBe(1);
-      expect(result.nome).toBe('Novo Nome');
+      expect(result.nome).toBe(novoNomeValue);
       expect(mockRepository.save).toHaveBeenCalledWith(expect.objectContaining({
-        nome: nomeValue,
+        nome: novoNomeValue,
         email: emailValue,
         cpf: cpfValue,
       }));
