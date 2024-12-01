@@ -57,6 +57,7 @@ router.get("/cliente/token/", async (req, res) => {
     try {
         const controller = new ClienteController(new ClienteGateway());
         if (req.headers.authorization) {
+            console.log('req.headers.authorization',req.headers.authorization);
             const cliente = await controller.buscarPorToken(req.headers.authorization);
 
             return res.status(201).send({ cliente });

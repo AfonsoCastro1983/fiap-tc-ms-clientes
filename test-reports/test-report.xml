@@ -1,54 +1,55 @@
 <testExecutions version="1">
 <file path="tests/CPF.test.ts">
-<testCase name="CPF deve criar uma inst&#xe2;ncia com CPF v&#xe1;lido" duration="9" />
-<testCase name="CPF deve lan&#xe7;ar erro para CPF com menos de 11 d&#xed;gitos" duration="14" />
-<testCase name="CPF deve lan&#xe7;ar erro para CPF com mais de 11 d&#xed;gitos" duration="2" />
+<testCase name="CPF deve criar uma inst&#xe2;ncia com CPF v&#xe1;lido" duration="4" />
+<testCase name="CPF deve lan&#xe7;ar erro para CPF com menos de 11 d&#xed;gitos" duration="9" />
+<testCase name="CPF deve lan&#xe7;ar erro para CPF com mais de 11 d&#xed;gitos" duration="1" />
 <testCase name="CPF deve lan&#xe7;ar erro para CPF com todos os d&#xed;gitos iguais" duration="1" />
-<testCase name="CPF deve lan&#xe7;ar erro para CPF com d&#xed;gitos verificadores incorretos" duration="1" />
-<testCase name="CPF deve aceitar CPF com caracteres n&#xe3;o num&#xe9;ricos" duration="1" />
+<testCase name="CPF deve lan&#xe7;ar erro para CPF com d&#xed;gitos verificadores incorretos" duration="2" />
+<testCase name="CPF deve aceitar CPF com caracteres n&#xe3;o num&#xe9;ricos" duration="0" />
 <testCase name="CPF deve lan&#xe7;ar erro para CPF em branco" duration="1" />
 <testCase name="CPF deve lan&#xe7;ar erro para CPF com apenas espa&#xe7;os" duration="1" />
 </file>
+<file path="tests/CadastrarClienteDto.test.ts">
+<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Cria&#xe7;&#xe3;o Deve criar um DTO com valores padr&#xe3;o" duration="11" />
+<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Cria&#xe7;&#xe3;o Deve criar um DTO com valores preenchidos" duration="2" />
+<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Campos Deve validar DTO com campos obrigat&#xf3;rios" duration="4" />
+<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Campos Deve falhar se nome estiver vazio" duration="2" />
+<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Campos Deve falhar se idcognito estiver vazio" duration="2" />
+<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Campos Deve validar email com formato correto" duration="6" />
+<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Campos Deve falhar com email inv&#xe1;lido" duration="2" />
+<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Campos Deve validar CPF com formato correto" duration="10" />
+</file>
 <file path="tests/ClienteGateway.test.ts">
 <testCase name="Gateway de Clientes Cen&#xe1;rio: Salvar um cliente com sucesso DADO um cliente com dados v&#xe1;lidos, QUANDO eu tentar salv&#xe1;-lo, ENT&#xc3;O o cliente deve ser salvo com sucesso" duration="36" />
-<testCase name="Gateway de Clientes Cen&#xe1;rio: Atualizar um cliente quando o CPF j&#xe1; existir DADO um CPF v&#xe1;lido e j&#xe1; existente, QUANDO eu salvar um cliente, ENT&#xc3;O dever&#xe1; ser atualizado o cliente j&#xe1; gravado" duration="5" />
-<testCase name="Gateway de Clientes Cen&#xe1;rio: Buscar um cliente por CPF com sucesso DADO um CPF v&#xe1;lido, QUANDO eu buscar o cliente, ENT&#xc3;O os dados do cliente devem ser retornados" duration="2" />
-<testCase name="Gateway de Clientes Cen&#xe1;rio: Retornar cliente zerado ao buscar por CPF inexistente DADO um CPF inexistente, QUANDO eu buscar o cliente, ENT&#xc3;O deve retornar um cliente com dados zerados" duration="1" />
-<testCase name="Gateway de Clientes Cen&#xe1;rio: Buscar um cliente por e-mail com sucesso DADO um e-mail v&#xe1;lido, QUANDO eu buscar o cliente, ENT&#xc3;O os dados do cliente devem ser retornados" duration="2" />
+<testCase name="Gateway de Clientes Cen&#xe1;rio: Atualizar um cliente quando o CPF j&#xe1; existir DADO um CPF v&#xe1;lido e j&#xe1; existente, QUANDO eu salvar um cliente, ENT&#xc3;O dever&#xe1; ser atualizado o cliente j&#xe1; gravado" duration="8" />
+<testCase name="Gateway de Clientes Cen&#xe1;rio: Buscar um cliente por CPF com sucesso DADO um CPF v&#xe1;lido, QUANDO eu buscar o cliente, ENT&#xc3;O os dados do cliente devem ser retornados" duration="1" />
+<testCase name="Gateway de Clientes Cen&#xe1;rio: Retornar cliente zerado ao buscar por CPF inexistente DADO um CPF inexistente, QUANDO eu buscar o cliente, ENT&#xc3;O deve retornar um cliente com dados zerados" duration="2" />
+<testCase name="Gateway de Clientes Cen&#xe1;rio: Buscar um cliente por e-mail com sucesso DADO um e-mail v&#xe1;lido, QUANDO eu buscar o cliente, ENT&#xc3;O os dados do cliente devem ser retornados" duration="1" />
 <testCase name="Gateway de Clientes Cen&#xe1;rio: Buscar um cliente por um ID com sucesso DADO um ID v&#xe1;lido, QUANDO eu buscar o cliente, ENT&#xc3;O os dados do cliente devem ser retornados" duration="1" />
-<testCase name="Gateway de Clientes Cen&#xe1;rio: Buscar um cliente por um ID inv&#xe1;lido DADO um ID inv&#xe1;lido, QUANDO eu buscar o cliente, ENT&#xc3;O retornar&#xe1; um cliente zerado" duration="1" />
-<testCase name="Gateway de Clientes Cen&#xe1;rio: Buscar um cliente por token JWT com sucesso DADO um token JWT v&#xe1;lido, QUANDO eu buscar o cliente, ENT&#xc3;O os dados do cliente devem ser retornados" duration="5" />
-<testCase name="Gateway de Clientes Cen&#xe1;rio: Retornar cliente zerado ao buscar por token JWT inexistente DADO um token JWT inexistente, QUANDO eu buscar o cliente, ENT&#xc3;O deve retornar um cliente com dados zerados" duration="1" />
-</file>
-<file path="tests/CadastrarClienteDto.test.ts">
-<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Cria&#xe7;&#xe3;o Deve criar um DTO com valores padr&#xe3;o" duration="6" />
-<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Cria&#xe7;&#xe3;o Deve criar um DTO com valores preenchidos" duration="1" />
-<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Campos Deve validar DTO com campos obrigat&#xf3;rios" duration="1" />
-<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Campos Deve falhar se nome estiver vazio" duration="1" />
-<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Campos Deve falhar se idcognito estiver vazio" duration="0" />
-<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Campos Deve validar email com formato correto" duration="2" />
-<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Campos Deve falhar com email inv&#xe1;lido" duration="1" />
-<testCase name="CadastrarClienteDto Valida&#xe7;&#xf5;es de Campos Deve validar CPF com formato correto" duration="0" />
+<testCase name="Gateway de Clientes Cen&#xe1;rio: Buscar um cliente por um ID inv&#xe1;lido DADO um ID inv&#xe1;lido, QUANDO eu buscar o cliente, ENT&#xc3;O retornar&#xe1; um cliente zerado" duration="2" />
+<testCase name="Gateway de Clientes Cen&#xe1;rio: Buscar um cliente por token JWT com sucesso DADO um token JWT v&#xe1;lido, QUANDO eu buscar o cliente, ENT&#xc3;O os dados do cliente devem ser retornados" duration="11" />
+<testCase name="Gateway de Clientes Cen&#xe1;rio: Retornar cliente zerado ao buscar por token JWT inexistente DADO um token JWT inexistente, QUANDO eu buscar o cliente, ENT&#xc3;O deve retornar um cliente com dados zerados" duration="3" />
 </file>
 <file path="tests/CadastrarClienteUseCase.test.ts">
-<testCase name="CadastrarClienteUseCase Cen&#xe1;rio: Cadastrar um cliente com dados v&#xe1;lidos DADO um cliente com dados v&#xe1;lidos, QUANDO eu tentar cadastr&#xe1;-lo, ENT&#xc3;O o cliente deve ser salvo com sucesso" duration="5" />
-<testCase name="CadastrarClienteUseCase Cen&#xe1;rio: Retornar erro ao cadastrar cliente com CPF j&#xe1; existente DADO um cliente com CPF j&#xe1; cadastrado, QUANDO eu tentar cadastr&#xe1;-lo, ENT&#xc3;O deve lan&#xe7;ar um erro informando que o CPF j&#xe1; existe" duration="8" />
+<testCase name="CadastrarClienteUseCase Cen&#xe1;rio: Cadastrar um cliente com dados v&#xe1;lidos DADO um cliente com dados v&#xe1;lidos, QUANDO eu tentar cadastr&#xe1;-lo, ENT&#xc3;O o cliente deve ser salvo com sucesso" duration="7" />
+<testCase name="CadastrarClienteUseCase Cen&#xe1;rio: Retornar erro ao cadastrar cliente com CPF j&#xe1; existente DADO um cliente com CPF j&#xe1; cadastrado, QUANDO eu tentar cadastr&#xe1;-lo, ENT&#xc3;O deve lan&#xe7;ar um erro informando que o CPF j&#xe1; existe" duration="7" />
 <testCase name="CadastrarClienteUseCase Cen&#xe1;rio: Buscar um cliente por CPF com sucesso DADO um CPF v&#xe1;lido, QUANDO eu buscar o cliente, ENT&#xc3;O os dados do cliente devem ser retornados" duration="1" />
-<testCase name="CadastrarClienteUseCase Cen&#xe1;rio: Retornar cliente zerado ao buscar por CPF inexistente DADO um CPF inexistente, QUANDO eu buscar o cliente, ENT&#xc3;O deve retornar um cliente com dados zerados" duration="0" />
+<testCase name="CadastrarClienteUseCase Cen&#xe1;rio: Retornar cliente zerado ao buscar por CPF inexistente DADO um CPF inexistente, QUANDO eu buscar o cliente, ENT&#xc3;O deve retornar um cliente com dados zerados" duration="1" />
 <testCase name="CadastrarClienteUseCase Cen&#xe1;rio: Buscar um cliente por e-mail com sucesso DADO um e-mail v&#xe1;lido, QUANDO eu buscar o cliente, ENT&#xc3;O os dados do cliente devem ser retornados" duration="1" />
 <testCase name="CadastrarClienteUseCase Cen&#xe1;rio: Retornar cliente zerado ao buscar por e-mail inexistente DADO um e-mail inexistente, QUANDO eu buscar o cliente, ENT&#xc3;O deve retornar um cliente com dados zerados" duration="1" />
-<testCase name="CadastrarClienteUseCase Cen&#xe1;rio: Buscar um cliente por ID com sucesso DADO um ID v&#xe1;lido, QUANDO eu buscar o cliente, ENT&#xc3;O os dados do cliente devem ser retornados" duration="2" />
-<testCase name="CadastrarClienteUseCase Cen&#xe1;rio: Retornar cliente zerado ao buscar por ID inexistente DADO um ID inexistente, QUANDO eu buscar o cliente, ENT&#xc3;O deve retornar um cliente com dados zerados" duration="3" />
+<testCase name="CadastrarClienteUseCase Cen&#xe1;rio: Buscar um cliente por ID com sucesso DADO um ID v&#xe1;lido, QUANDO eu buscar o cliente, ENT&#xc3;O os dados do cliente devem ser retornados" duration="0" />
+<testCase name="CadastrarClienteUseCase Cen&#xe1;rio: Retornar cliente zerado ao buscar por ID inexistente DADO um ID inexistente, QUANDO eu buscar o cliente, ENT&#xc3;O deve retornar um cliente com dados zerados" duration="0" />
 </file>
 <file path="tests/ClienteController.test.ts">
-<testCase name="Controller de Clientes Cen&#xe1;rio: Salvar um cliente com sucesso DADO um cliente com dados v&#xe1;lidos, QUANDO eu tentar salv&#xe1;-lo, ENT&#xc3;O o cliente deve ser salvo com sucesso" duration="10" />
+<testCase name="Controller de Clientes Cen&#xe1;rio: Salvar um cliente com sucesso DADO um cliente com dados v&#xe1;lidos, QUANDO eu tentar salv&#xe1;-lo, ENT&#xc3;O o cliente deve ser salvo com sucesso" duration="15" />
 <testCase name="Controller de Clientes Cen&#xe1;rio: Criar um cliente sem CPF e e-mail com sucesso DADO um cliente sem CPF e e-mail, QUANDO eu tentar salv&#xe1;-lo, ENT&#xc3;O o cliente deve ser salvo com sucesso" duration="1" />
-<testCase name="Controller de Clientes Cen&#xe1;rio: Cadastrar cliente com um e-mail inv&#xe1;lido DADO um novo cadastro, QUANDO eu inserir um e-mail muito longo, ENT&#xc3;O dovo receber uma mensagem &apos;Email muito longo&apos;" duration="18" />
+<testCase name="Controller de Clientes Cen&#xe1;rio: Cadastrar cliente com um e-mail inv&#xe1;lido DADO um novo cadastro, QUANDO eu inserir um e-mail muito longo, ENT&#xc3;O dovo receber uma mensagem &apos;Email muito longo&apos;" duration="11" />
 <testCase name="Controller de Clientes Cen&#xe1;rio: Cadastrar cliente com um e-mail inv&#xe1;lido DADO um novo cadastro, QUANDO eu inserir um e-mail com dom&#xed;nio muito longo, ENT&#xc3;O dovo receber uma mensagem &apos;Parte local do email muito longa&apos;" duration="1" />
-<testCase name="Controller de Clientes Cen&#xe1;rio: Cadastrar cliente com um e-mail inv&#xe1;lido DADO um novo cadastro, QUANDO eu inserir um e-mail inv&#xe1;lido, ENT&#xc3;O dovo receber uma mensagem &apos;Email inv&#xe1;lido&apos;" duration="2" />
+<testCase name="Controller de Clientes Cen&#xe1;rio: Cadastrar cliente com um e-mail inv&#xe1;lido DADO um novo cadastro, QUANDO eu inserir um e-mail inv&#xe1;lido, ENT&#xc3;O dovo receber uma mensagem &apos;Email inv&#xe1;lido&apos;" duration="1" />
 <testCase name="Controller de Clientes Cen&#xe1;rio: Buscar cliente por CPF com sucesso DADO um CPF v&#xe1;lido, QUANDO eu buscar o cliente, ENT&#xc3;O os dados do cliente devem ser retornados" duration="1" />
-<testCase name="Controller de Clientes Cen&#xe1;rio: Retornar cliente zerado ao buscar por CPF inexistente DADO um CPF inexistente, QUANDO eu buscar o cliente, ENT&#xc3;O deve retornar um cliente com dados zerados" duration="0" />
+<testCase name="Controller de Clientes Cen&#xe1;rio: Retornar cliente zerado ao buscar por CPF inexistente DADO um CPF inexistente, QUANDO eu buscar o cliente, ENT&#xc3;O deve retornar um cliente com dados zerados" duration="1" />
 <testCase name="Controller de Clientes Cen&#xe1;rio: Buscar cliente por e-mail com sucesso DADO um e-mail v&#xe1;lido, QUANDO eu buscar o cliente, ENT&#xc3;O os dados do cliente devem ser retornados" duration="1" />
-<testCase name="Controller de Clientes Cen&#xe1;rio: Retornar cliente zerado ao buscar por e-mail inexistente DADO um e-mail inexistente, QUANDO eu buscar o cliente, ENT&#xc3;O deve retornar um cliente com dados zerados" duration="1" />
+<testCase name="Controller de Clientes Cen&#xe1;rio: Retornar cliente zerado ao buscar por e-mail inexistente DADO um e-mail inexistente, QUANDO eu buscar o cliente, ENT&#xc3;O deve retornar um cliente com dados zerados" duration="0" />
+<testCase name="Controller de Clientes Cen&#xe1;rio: Retornar cliente v&#xe1;lido ao buscar por um token DADO um Authorization de um cliente v&#xe1;lido, QUANDO preenchido no header da chamada, ENT&#xc3;O deve retornar um cliente" duration="1" />
 </file>
 </testExecutions>

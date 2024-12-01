@@ -20,7 +20,7 @@ interface ClienteResponse {
 @Route("cliente")
 @Tags("Cliente")
 export default class ClienteController {
-    private cadastrarClienteUseCase: CadastrarClienteUseCase;
+    private readonly cadastrarClienteUseCase: CadastrarClienteUseCase;
 
     constructor(clienteGateway: ClienteGateway) {
         this.cadastrarClienteUseCase = new CadastrarClienteUseCase(clienteGateway);
@@ -46,8 +46,8 @@ export default class ClienteController {
         return {
             id: cliente.id,
             nome: cliente.nome,
-            cpf: cliente.cpf?.value || "",
-            email: cliente.email?.value || "",
+            cpf: cliente.cpf?.value ?? "",
+            email: cliente.email?.value ?? "",
         }
     }
     /**
@@ -62,8 +62,8 @@ export default class ClienteController {
         return {
             id: cliente.id,
             nome: cliente.nome,
-            cpf: cliente.cpf?.value || "",
-            email: cliente.email?.value || "",
+            cpf: cliente.cpf?.value ?? "",
+            email: cliente.email?.value ?? "",
         }
 
     }
@@ -79,8 +79,8 @@ export default class ClienteController {
         return {
             id: cliente.id,
             nome: cliente.nome,
-            cpf: cliente.cpf?.value || "",
-            email: cliente.email?.value || "",
+            cpf: cliente.cpf?.value ?? "",
+            email: cliente.email?.value ?? "",
         }
 
     }
@@ -98,8 +98,8 @@ export default class ClienteController {
         return {
             id: cliente.id,
             nome: cliente.nome,
-            cpf: cliente.cpf?.value || "",
-            email: cliente.email?.value || "",
+            cpf: cliente.cpf?.value ?? "",
+            email: cliente.email?.value ?? "",
         }
     }
 }
